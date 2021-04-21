@@ -1,63 +1,101 @@
-$ ry -3 -m pip install -u discord.py[voice]
-
 import discord
 
-# TOKEN = 'xxxxxxxxxxxxxxxxxxxxxxxx.yyyyyy.zzzzzzzzzzzzzzzzzzzzzzzzzzz'
 
+TOKEN = 'NjQ5NTYxMTE2NDg1MDkxMzI4.Xd-k7g.fpd8KrciNTDFlqgRyHr0BMWglVI' #TOKENIDの部分を自分のIDに変える
 
-discord.Object(id)
-
-	a == '1'
-	b == '2'
-	c == '3'
-	d == '4'
-	e == '5'
-	name == ''
-	dam == ''
-
-global_with_embed.py
-import discord
 
 client = discord.Client()
 
+
+BossNum = ["1","2","3","4","5"]
+# If someone reserve an attack, add to this list.
+Booking1 = [1ボス]
+Booking2 = [2ボス]
+Booking3 = [3ボス]
+Booking4 = [4ボス]
+Booking5 = [5ボス]
+
+
 @client.event
 async def on_message(message):
-    if message.author.bot:
-        # もし、送信者がbotなら無視する
-        return
+    listFlag = 0
+    bookFlag = 0
+    endFlag = 0
+    displayFlag = 0
 
-    GLOBAL_CH_NAME = "進行発言チャンネル" # グローバルチャットのチャンネル名
+    
+    if message.content.startswith("凸"):
+       if "list" in message.content: # Call a list
+           listFlag = 1
+       elif "消" in message.content: # Initialize all lists
+           endFlag = 1
+       elif "リスト" in message.content: # Call all arrays
+           displayFlag = 1
+       else: # Book
+           bookFlag = 1
 
-    if message.channel.name == GLOBAL_CH_NAME:
-        # hoge-globalの名前をもつチャンネルに投稿されたので、メッセージを転送する
 
-        await message.delete() # 元のメッセージは削除しておく
+       if listFlag == 1:
+           for Boss in BossNum:
+               tmpList = []
+               if Boss in message.content:
+                  BookList = "Booking" + Boss
+                  tmpList = [x[0] for x in eval(BookList)]
+                  member = ""
+                  for one in tmpList:
+                      member += one + " "
+                  await message.channel.send("Boss" + Boss + ":" + member)
+           listFlag =  0
 
-        channels = client.get_all_channels()
+
+       elif endFlag == 1:
+           for Boss in BossNum:
+                  BookList = "Booking" + Boss
+                  eval(BookList).clear()
+           reply = "予約を全削除"
+           await message.channel.send(reply)
+           endFlag = 0
 
 
-        embed = discord.Embed(title="進行発言チャンネル",
-            description=message.content, color=0x00bfff)
+       elif bookFlag == 1:
+           bossCount = 0
+           for Boss in BossNum:
+               if Boss in message.content:
+                  BookList = "Booking" + Boss
+                  eval(BookList).append([message.author.display_name, str(message.author.mention)])
+                  bossCount += 1
+           if bossCount >= 1:
+               reply = str(bossCount) + "件の予約 >" + message.author.display_name
+               await message.channel.send(reply)
+           bookFlag = 0
 
-        embed.set_author(name=message.author.display_name, 
 
-        embed.set_footer(text=f"{name} / {a} / {dam}",
-            
-	 embed.set_footer(text=f"{name} / {b} / {dam}",
+       elif displayFlag == 1: # Display all book list
+           for Boss in BossNum:
+               tmpList = []
+               BookList = "Booking" + Boss
+               tmpList= [x[0] for x in eval(BookList)]
+               member = ""
+               for one in tmpList:
+                   member += one + " "
+               await message.channel.send("Boss" + Boss + ":" + member)
+           displayFlag = 0
 
-	embed.set_footer(text=f"{name} / {c} / {dam}",
 
-	embed.set_footer(text=f"{name} / {d} / {dam}",
+    elif message.content.startswith("f"):
+        for Boss in BossNum:
+               if Boss in message.content:
+                   BookList = "Booking" + Boss
+                   eval(BookList).remove([message.author.display_name,str(message.author.mention)]) 
+        reply = "削除完了 >" + message.author.display_name
+        await message.channel.send(reply)
 
-	embed.set_footer(text=f"{name} / {e} / {dam}",
-           
-        # Embedインスタンスを生成、投稿者、投稿場所などの設定
 
-        for channel in global_channels:
-            # メッセージを埋め込み形式で転送
-            await channel.send(embed=embed)
-	returm
+   
+    elif message.content.startswith("コマンド"):
+        reply = "凸:凸 1-5 / 予約表示:rsv list 1-5 / 予約全表示:凸リスト / 予約削除:f 1-5 / 予約全削除:凸消"
+        await message.channel.send(reply)
+         
 
-client.run(token)
-
+client.run(TOKEN)
 
